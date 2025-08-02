@@ -24,20 +24,27 @@ global.was_logged = false;
 
 //יבוא הראוטרים
 const userRouter = require('./Routers/users_R');
+const categoryRouter = require('./Routers/category_R');
+
 
 //חיבור לנתיב
 app.use("/U", userRouter);
+app.use("/C", categoryRouter);
 
 
+const user_Mid = require("./middleware/user_Mid");
 
-
-app.post('/login', [userMid.CheckLogin], (req, res) => {
+app.post('/login', [user_Mid.CheckLogin], (req, res) => {
     if (req.validUser) {
-        res.redirect(""); // ליצור את עמוד המשתמש להוספת משימות ולהדביק כאן
+        res.json({
+            success: true,
+            token: req.jwtToken  // נוסיף אותו ב־middleware
+        });
     } else {
-        res.send("שם משתמש או סיסמה שגויים");
+        res.status(401).json({ success: false, message: "שם משתמש או סיסמה שגויים" });
     }
 });
+
 app.get('/login', (req, res) => {
     res.render("login");
 });
@@ -46,8 +53,8 @@ app.get('/login', (req, res) => {
 
 
 app.get('/', (req, res) => {
-    res.send("הראוטר עובד ");
-})
+    res.send("🔧 ברוכה הבאה! השרת פועל.");
+});
 
 app.listen(port, () => {
     console.log(`Now listening on port http://localhost:${port}`);

@@ -20,7 +20,7 @@ async function isLogged(req, res, next) {
 
     next();
 }
-
+/*
 async function CheckLogin(req, res, next) {
     let uname = req.body.uname ? addSlashes(req.body.uname) : "";
     let passwd = req.body.passwd || "";
@@ -49,7 +49,42 @@ async function CheckLogin(req, res, next) {
     }
 
     next();
+}*/
+async function CheckLogin(req, res, next) {
+    let uname = req.body && req.body.uname ? addSlashes(req.body.uname) : "";
+
+    let passwd = req.body && req.body.passwd ? req.body.passwd : "";
+    let enc_pass = md5("A" + passwd);
+    let Query = `SELECT * FROM users WHERE uname = '${uname}' AND passwd = '${enc_pass}'`;
+
+    const promisePool = db_pool.promise();
+    let rows = [];
+
+    try {
+        [rows] = await promisePool.query(Query);
+    } catch (err) {
+        console.log(err);
+    }
+
+    if (rows.length > 0) {
+        req.validUser = true;
+        let val = `${rows[0].id},${rows[0].name}`;
+        const token = jwt.sign(
+            { data: val },
+            'myPrivateKey',
+            { expiresIn: 31 * 24 * 60 * 60 }
+        );
+
+        // במקום לשלוח עוגייה:
+        req.jwtToken = token;
+        req.user_id = rows[0].id;
+    } else {
+        req.validUser = false;
+    }
+
+    next();
 }
+
 
 async function AddUser(req, res, next) {
     let name = req.body.name ? addSlashes(req.body.name) : "";
