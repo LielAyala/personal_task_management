@@ -90,35 +90,6 @@ async function UpdateUser(req, res, next) {
     next();
 }
 
-async function GetAllUsers(req, res, next) {
-    let page = req.query.p ? parseInt(req.query.p) : 0;
-    let rowPerPage = 2;
-    req.page = page;
-
-    let total_rows = 0;
-    const promisePool = db_pool.promise();
-
-    try {
-        let [rows] = await promisePool.query("SELECT COUNT(id) AS cnt FROM users");
-        total_rows = rows[0].cnt;
-    } catch (err) {
-        console.log(err);
-    }
-
-    req.total_pages = Math.floor(total_rows / rowPerPage);
-
-    let Query = `SELECT * FROM users LIMIT ${page * rowPerPage},${rowPerPage}`;
-    try {
-        let [rows] = await promisePool.query(Query);
-        req.users_data = rows;
-    } catch (err) {
-        console.log(err);
-        req.users_data = [];
-    }
-
-    next();
-}
-
 async function GetOneUser(req, res, next) {
     let id = parseInt(req.params.id);
     if (isNaN(id) || id <= 0) {
@@ -140,27 +111,12 @@ async function GetOneUser(req, res, next) {
     next();
 }
 
-async function DeleteUser(req, res, next) {
-    let id = parseInt(req.body.id);
-    if (id > 0) {
-        let Query = `DELETE FROM users WHERE id='${id}'`;
-        const promisePool = db_pool.promise();
-        try {
-            await promisePool.query(Query);
-        } catch (err) {
-            console.log(err);
-        }
-    }
 
-    next();
-}
 
 module.exports = {
     AddUser,
-    GetAllUsers,
     GetOneUser,
-    DeleteUser,
     UpdateUser,
     CheckLogin,
-    isLogged,
+    isLogged
 };
