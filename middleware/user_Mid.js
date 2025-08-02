@@ -1,5 +1,7 @@
 var md5 = require('md5');
-
+/*
+קוד של אמיר של האבטחת סיסמאות שימוש בADDSLASHES
+*/
 async function isLogged(req, res, next) {
     const jwtToken = req.cookies.ImLoggedToYoman;
     let user_id = -1;
