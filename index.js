@@ -21,7 +21,8 @@ global.stripSlashes  = require('slashes').stripSlashes;
 
 global.was_logged = false;
 app.get('/', (req, res) => {
-    res.render("index", {});
+    res.send("הראוטר עובד ");
+    // res.render("index", {});
 })
 
 app.listen(port, () => {
