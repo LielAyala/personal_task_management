@@ -10,7 +10,6 @@ router.get("/", [userMid.isLogged, catMid.GetAllCategories], (req, res) => {
     });
 });
 
-
 router.post("/Add", [userMid.isLogged, catMid.AddCategory], (req, res) => {
     res.redirect("/C");
 });
@@ -20,4 +19,3 @@ router.post("/Delete", [userMid.isLogged, catMid.DeleteCategory], (req, res) => 
 });
 
 module.exports = router;
-זזז

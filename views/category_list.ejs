@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>רשימת קטגוריות</title>
+    <style>
+        body {
+            direction: rtl;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+        form {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<h2>רשימת קטגוריות</h2>
+<table>
+    <thead>
+    <tr><th>שם</th><th>מחיקה</th></tr>
+    </thead>
+    <tbody>
+    <% for (let cat of categories) { %>
+        <tr>
+            <td><%= cat.name %></td>
+            <td>
+                <form action="/C/Delete" method="POST">
+                    <input type="hidden" name="id" value="<%= cat.id %>">
+                    <button type="submit">מחק</button>
+                </form>
+            </td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+
+</body>
+</html>
