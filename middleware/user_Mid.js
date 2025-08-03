@@ -1,81 +1,29 @@
-var md5 = require('md5');
-/*
-קוד של אמיר של האבטחת סיסמאות שימוש בADDSLASHES
-*/
-async function isLogged(req, res, next) {
-    const jwtToken = req.cookies.ImLoggedToYoman;
-    let user_id = -1;
-    if (jwtToken && jwtToken !== "") {
-        jwt.verify(jwtToken, 'myPrivateKey', async (err, decodedToken) => {
-            if (!err && decodedToken.data) {
-                let data = decodedToken.data;
-                user_id = data.split(",")[0];
-                req.user_id = user_id;
-            }
-        });
-    }
+const md5 = require('md5');
+const jwt = require("jsonwebtoken");
+const db_pool = require("../database"); // לוודא שזה אותו db של כל הפרויקט
+const addSlashes = require('slashes').addSlashes;
 
-    if (user_id < 0)
-        return res.redirect("/login");
-
-    next();
-}
-/*
-async function CheckLogin(req, res, next) {
-    let uname = req.body.uname ? addSlashes(req.body.uname) : "";
-    let passwd = req.body.passwd || "";
-    let enc_pass = md5("A" + passwd);
-    let Query = `SELECT * FROM users WHERE uname = '${uname}' AND passwd = '${enc_pass}'`;
-
-    const promisePool = db_pool.promise();
-    let rows = [];
-    try {
-        [rows] = await promisePool.query(Query);
-    } catch (err) {
-        console.log(err);
-    }
-
-    if (rows.length > 0) {
-        req.validUser = true;
-        let val = `${rows[0].id},${rows[0].name}`;
-        var token = jwt.sign(
-            { data: val },
-            'myPrivateKey',
-            { expiresIn: 31 * 24 * 60 * 60 }
-        );
-        res.cookie("ImLoggedToYoman", token, {
-            maxAge: 31 * 24 * 60 * 60 * 1000
-        });
-    }
-
-    next();
-}*/
+// התחברות - בדיקת משתמש והנפקת טוקן
 async function CheckLogin(req, res, next) {
     let uname = req.body && req.body.uname ? addSlashes(req.body.uname) : "";
-
     let passwd = req.body && req.body.passwd ? req.body.passwd : "";
     let enc_pass = md5("A" + passwd);
     let Query = `SELECT * FROM users WHERE uname = '${uname}' AND passwd = '${enc_pass}'`;
 
-    const promisePool = db_pool.promise();
     let rows = [];
-
     try {
-        [rows] = await promisePool.query(Query);
+        [rows] = await db_pool.query(Query);
     } catch (err) {
         console.log(err);
     }
 
     if (rows.length > 0) {
         req.validUser = true;
-        let val = `${rows[0].id},${rows[0].name}`;
         const token = jwt.sign(
-            { data: val },
+            { user_id: rows[0].id }, // 🧠 שם מפורש
             'myPrivateKey',
-            { expiresIn: 31 * 24 * 60 * 60 }
+            { expiresIn: "31d" }
         );
-
-        // במקום לשלוח עוגייה:
         req.jwtToken = token;
         req.user_id = rows[0].id;
     } else {
@@ -85,7 +33,21 @@ async function CheckLogin(req, res, next) {
     next();
 }
 
+// בדיקה אם מחובר לפי טוקן
+function isLogged(req, res, next) {
+    try {
+        let token = req.cookies.ImLoggedToYoman;
+        if (!token) throw new Error("Missing token");
 
+        let payload = jwt.verify(token, 'myPrivateKey');
+        req.user_id = payload.user_id;
+        next();
+    } catch (err) {
+        res.status(401).render("login", { error: "יש להתחבר" });
+    }
+}
+
+// CRUD למשתמש
 async function AddUser(req, res, next) {
     let name = req.body.name ? addSlashes(req.body.name) : "";
     let uname = req.body.uname ? addSlashes(req.body.uname) : "";
@@ -93,10 +55,8 @@ async function AddUser(req, res, next) {
     let enc_pass = md5("A" + passwd);
 
     let Query = `INSERT INTO users (name, uname, passwd) VALUES ('${name}', '${uname}', '${enc_pass}')`;
-
-    const promisePool = db_pool.promise();
     try {
-        await promisePool.query(Query);
+        await db_pool.query(Query);
     } catch (err) {
         console.log(err);
     }
@@ -113,13 +73,11 @@ async function UpdateUser(req, res, next) {
 
     let name = req.body.name ? addSlashes(req.body.name) : "";
     let uname = req.body.uname ? addSlashes(req.body.uname) : "";
-
     req.GoodOne = true;
 
     let Query = `UPDATE users SET name='${name}', uname='${uname}' WHERE id='${id}'`;
-    const promisePool = db_pool.promise();
     try {
-        await promisePool.query(Query);
+        await db_pool.query(Query);
     } catch (err) {
         console.log(err);
     }
@@ -136,9 +94,8 @@ async function GetOneUser(req, res, next) {
 
     req.GoodOne = true;
     let Query = `SELECT * FROM users WHERE id='${id}'`;
-    const promisePool = db_pool.promise();
     try {
-        let [rows] = await promisePool.query(Query);
+        let [rows] = await db_pool.query(Query);
         req.one_user_data = rows.length > 0 ? rows[0] : {};
     } catch (err) {
         console.log(err);
@@ -148,12 +105,10 @@ async function GetOneUser(req, res, next) {
     next();
 }
 
-
-
 module.exports = {
-    AddUser,
-    GetOneUser,
-    UpdateUser,
     CheckLogin,
-    isLogged
+    isLogged,
+    AddUser,
+    UpdateUser,
+    GetOneUser
 };

@@ -1,11 +1,12 @@
-// middleware/category_Mid.js
+const db_pool = require("../database");
+const addSlashes = require('slashes').addSlashes;
+
 async function GetAllCategories(req, res, next) {
     const userId = req.user_id;
-    const promisePool = db_pool.promise();
     let rows = [];
 
     try {
-        [rows] = await promisePool.query(
+        [rows] = await db_pool.query(
             `SELECT * FROM categories WHERE user_id = ?`,
             [userId]
         );
@@ -16,56 +17,39 @@ async function GetAllCategories(req, res, next) {
     req.categories = rows;
     next();
 }
-/*
+
 async function AddCategory(req, res, next) {
     const userId = req.user_id;
     const name = addSlashes(req.body.name || "");
-    const promisePool = db_pool.promise();
+
+    if (!userId) return res.status(400).send("לא נמצא מזהה משתמש");
 
     try {
-        await promisePool.query(
+        await db_pool.query(
             `INSERT INTO categories (name, user_id) VALUES (?, ?)`,
             [name, userId]
         );
-    } catch (err) {
-        console.log(err);
-    }
-
-    next();
-}
-*/
-const promisePool = require("../database"); // לוודא שזה מגיע מ־promisePool
-
-async function AddCategory(req, res, next) {
-    console.log("BODY שהתקבל:", req.body);
-    let name = addSlashes(req.body.name);
-    let q = `INSERT INTO categories (name) VALUES ('${name}')`;
-
-    try {
-        await promisePool.query(q); // לא db_pool.query!!
         next();
     } catch (err) {
-        console.log("שגיאה בהוספה:", err);
+        console.log("שגיאה בהוספת קטגוריה:", err);
         res.status(500).send("בעיה בשרת");
     }
 }
 
-
 async function DeleteCategory(req, res, next) {
     const catId = parseInt(req.body.id);
     const userId = req.user_id;
-    const promisePool = db_pool.promise();
 
     try {
-        await promisePool.query(
+        await db_pool.query(
             `DELETE FROM categories WHERE id = ? AND user_id = ?`,
             [catId, userId]
         );
+        next();
     } catch (err) {
-        console.log(err);
+        console.log("שגיאה במחיקה:", err);
+        res.status(500).send("בעיה במחיקת קטגוריה");
     }
-
-    next();
 }
 
 module.exports = {

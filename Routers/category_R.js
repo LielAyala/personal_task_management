@@ -1,17 +1,17 @@
-// Routers/categories_R.js
 const express = require('express');
 const router = express.Router();
 
 const catMid = require("../middleware/category_Mid");
-const userMid = require("../middleware/user_Mid"); // בשביל isLogged
+const userMid = require("../middleware/user_Mid");
 
-router.get("/", [ catMid.GetAllCategories], (req, res) => {
+router.get("/", [userMid.isLogged, catMid.GetAllCategories], (req, res) => {
     res.render("category_list", {
         categories: req.categories
     });
 });
 
-router.post("/Add", [ catMid.AddCategory], (req, res) => {
+
+router.post("/Add", [userMid.isLogged, catMid.AddCategory], (req, res) => {
     res.redirect("/C");
 });
 
@@ -20,3 +20,4 @@ router.post("/Delete", [userMid.isLogged, catMid.DeleteCategory], (req, res) => 
 });
 
 module.exports = router;
+זזז
