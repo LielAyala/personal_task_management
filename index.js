@@ -56,5 +56,7 @@ app.listen(port, () => {
     console.log(`הצגת הקטגוריות  http://localhost:7777/C`);
     console.log(`התחברות  http://localhost:7777/login`);
     console.log(`הוספת משתמש http://localhost:7777/U/Add`);
+    console.log(`הוספת קטגוריה http://localhost:7777/C/Add`);
+
 
 });
