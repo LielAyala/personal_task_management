@@ -4,29 +4,20 @@ const router = express.Router();
 const catMid = require("../middleware/category_Mid");
 const userMid = require("../middleware/user_Mid");
 
-// הצגת כל הקטגוריות
 router.get("/", [userMid.isLogged, catMid.GetAllCategories], (req, res) => {
     res.render("category_list", {
         categories: req.categories
     });
 });
-
-// הצגת טופס הוספת קטגוריה
 router.get("/Add", userMid.isLogged, (req, res) => {
     res.render("category_add");
 });
-
-// שליחת קטגוריה חדשה
 router.post("/Add", [userMid.isLogged, catMid.AddCategory], (req, res) => {
     res.redirect("/C");
 });
-
-// מחיקת קטגוריה
 router.post("/Delete", [userMid.isLogged, catMid.DeleteCategory], (req, res) => {
     res.redirect("/C");
 });
-
-// הצגת טופס עריכת קטגוריה (דורש id)
 router.get("/Edit/:id", userMid.isLogged, async (req, res) => {
     const catId = parseInt(req.params.id);
     const userId = req.user_id;
@@ -49,8 +40,6 @@ router.get("/Edit/:id", userMid.isLogged, async (req, res) => {
         res.status(500).send("שגיאה בשרת");
     }
 });
-
-
 router.post("/Edit", userMid.isLogged, catMid.UpdateCategory, (req, res) => {
     res.redirect("/C");
 });

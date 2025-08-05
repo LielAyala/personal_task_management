@@ -17,7 +17,6 @@ async function GetAllCategories(req, res, next) {
     req.categories = rows;
     next();
 }
-
 async function AddCategory(req, res, next) {
     const userId = req.user_id;
     const name = addSlashes(req.body.name || "");
@@ -35,7 +34,6 @@ async function AddCategory(req, res, next) {
         res.status(500).send("בעיה בשרת");
     }
 }
-
 async function DeleteCategory(req, res, next) {
     const catId = parseInt(req.body.id);
     const userId = req.user_id;
@@ -51,7 +49,6 @@ async function DeleteCategory(req, res, next) {
         res.status(500).send("בעיה במחיקת קטגוריה");
     }
 }
-
 async function UpdateCategory(req, res, next) {
     const catId = parseInt(req.body.id);
     const newName = addSlashes(req.body.name || "");

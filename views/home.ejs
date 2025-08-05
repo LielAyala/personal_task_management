@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>דף הבית</title>
+    <style>
+        body {
+            direction: rtl;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 30px;
+        }
+        h2 {
+            margin-bottom: 40px;
+        }
+        .menu a {
+            display: block;
+            margin: 10px 0;
+            font-size: 18px;
+            text-decoration: none;
+            color: darkblue;
+        }
+    </style>
+</head>
+<body>
+
+<h2>ברוך הבא למערכת לניהול משימות של <%= user_name %></h2>
+
+<div class="menu">
+    <a href="/T/Add"> הוספת משימה</a>
+    <a href="/T/">המשימות שלי </a>
+    <a href="/C/Add"> הוספת קטגוריה</a>
+    <a href="/C/">הקטגוריות שלי </a>
+    <a href="/logout" style="background-color: #dc3545;">🚪 התנתק</a>
+
+</div>
+
+</body>
+</html>

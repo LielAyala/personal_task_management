@@ -20,9 +20,7 @@ let pool = mysql.createPool({
     keepAliveInitialDelay: 0
 })
 
-/*module.exports = {
-    pool:pool
-};*/
+
 const promisePool = pool.promise();
 
 module.exports = promisePool;

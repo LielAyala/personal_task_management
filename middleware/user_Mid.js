@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const db_pool = require("../database"); // לוודא שזה אותו db של כל הפרויקט
 const addSlashes = require('slashes').addSlashes;
 
-// התחברות - בדיקת משתמש והנפקת טוקן
 async function CheckLogin(req, res, next) {
     let uname = req.body && req.body.uname ? addSlashes(req.body.uname) : "";
     let passwd = req.body && req.body.passwd ? req.body.passwd : "";
@@ -20,7 +19,7 @@ async function CheckLogin(req, res, next) {
     if (rows.length > 0) {
         req.validUser = true;
         const token = jwt.sign(
-            { user_id: rows[0].id }, // 🧠 שם מפורש
+            { user_id: rows[0].id },
             'myPrivateKey',
             { expiresIn: "31d" }
         );
@@ -32,8 +31,6 @@ async function CheckLogin(req, res, next) {
 
     next();
 }
-
-// בדיקה אם מחובר לפי טוקן
 function isLogged(req, res, next) {
     try {
         let token = req.cookies.ImLoggedToYoman;
@@ -46,8 +43,6 @@ function isLogged(req, res, next) {
         res.status(401).render("login", { error: "יש להתחבר" });
     }
 }
-
-// CRUD למשתמש
 async function AddUser(req, res, next) {
     let name = req.body.name ? addSlashes(req.body.name) : "";
     let uname = req.body.uname ? addSlashes(req.body.uname) : "";
@@ -63,7 +58,6 @@ async function AddUser(req, res, next) {
 
     next();
 }
-
 async function UpdateUser(req, res, next) {
     let id = parseInt(req.params.id);
     if (id <= 0) {
@@ -84,7 +78,6 @@ async function UpdateUser(req, res, next) {
 
     next();
 }
-
 async function GetOneUser(req, res, next) {
     let id = parseInt(req.params.id);
     if (isNaN(id) || id <= 0) {

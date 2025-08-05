@@ -34,7 +34,7 @@
 </head>
 <body>
 
-<h2 style="text-align:center;">✏️ עריכת קטגוריה</h2>
+<h2 style="text-align:center;"> עריכת קטגוריה</h2>
 
 <form action="/C/Edit" method="POST">
     <input type="hidden" name="id" value="<%= category.id %>">
@@ -43,8 +43,10 @@
     <input type="text" name="name" value="<%= category.name %>" required>
 
     <div class="actions">
-        <button type="submit">💾 שמור</button>
-        <a href="/C">🔙 חזור לרשימה</a>
+        <button type="submit"> שמור</button>
+        <a href="/C"> חזור לרשימה</a>
+        <a href="/U/Home"> חזרה לדף הבית </a>
+
     </div>
 </form>
 

@@ -7,8 +7,6 @@ async function AddTask(req, res, next) {
     let { description, category_id, due_date } = req.body;
 
     if (!userId) return res.status(400).send("לא נמצא מזהה משתמש");
-
-    // מניעת הכנסת טקסטים בעייתיים
     description = addSlashes(description || "");
 
     try {
@@ -16,7 +14,7 @@ async function AddTask(req, res, next) {
             `INSERT INTO tasks (user_id, category_id, description, due_date) VALUES (?, ?, ?, ?)`,
             [userId, category_id, description, due_date]
         );
-        next(); // עובר להמשך השרשרת (כגון redirect)
+        next();
     } catch (err) {
         console.error("שגיאה בהוספת משימה:", err);
         res.status(500).send("בעיה בהוספת משימה");
@@ -24,7 +22,6 @@ async function AddTask(req, res, next) {
 }
 async function GetAllTask(req, res, next) {
     const userId = req.user_id;
-
     try {
         const [rows] = await db_pool.query(
             `SELECT * FROM tasks WHERE user_id = ?`,
@@ -50,7 +47,7 @@ async function DeleteTask(req, res, next) {
             `DELETE FROM tasks WHERE id = ? AND user_id = ?`,
             [taskId, userId]
         );
-        next(); // אם יש מידלוור אחר – זה סבבה
+        next();
     } catch (err) {
         console.error("שגיאה במחיקת משימה:", err);
         res.status(500).send("בעיה במחיקת משימה");
@@ -85,7 +82,7 @@ async function UpdateTaskStatus(req, res, next) {
             `UPDATE tasks SET is_completed = ? WHERE id = ? AND user_id = ?`,
             [isCompleted, taskId, userId]
         );
-        next(); // או res.redirect('/T') אם את לא משתמשת ב־next
+        next();
     } catch (err) {
         console.error("שגיאה בעדכון סטטוס משימה:", err);
         res.status(500).send("בעיה בעדכון סטטוס");
@@ -98,21 +95,32 @@ async function GetFilteredTasks(req, res, next) {
     const status = req.query.status || "all";
     const category = req.query.category || "all";
     const rowPerPage = 10;
+    const userId = req.user_id;
 
-    let where = " WHERE 1=1 ";
-    if (status === "done") where += " AND is_completed = 1 ";
-    else if (status === "not_done") where += " AND is_completed = 0 ";
-    if (category !== "all") where += ` AND category_id = ${parseInt(category)} `;
+    let where = " WHERE user_id = ? ";
+    let params = [userId];
+
+    if (status === "done") {
+        where += " AND is_completed = 1 ";
+    } else if (status === "not_done") {
+        where += " AND is_completed = 0 ";
+    }
+
+    if (category !== "all") {
+        where += " AND category_id = ? ";
+        params.push(parseInt(category));
+    }
 
     let countQuery = `SELECT COUNT(id) as cnt FROM tasks ${where}`;
-    let dataQuery = `SELECT * FROM tasks ${where} ORDER BY due_date ASC LIMIT ${page * rowPerPage}, ${rowPerPage}`;
+    let dataQuery = `SELECT * FROM tasks ${where} ORDER BY due_date ASC LIMIT ?, ?`;
 
     try {
-        const [countRows] = await promisePool.query(countQuery);
+        const [countRows] = await promisePool.query(countQuery, params);
         const total_rows = countRows[0].cnt;
         req.total_pages = Math.floor((total_rows - 1) / rowPerPage);
 
-        const [tasks] = await promisePool.query(dataQuery);
+        params.push(page * rowPerPage, rowPerPage);
+        const [tasks] = await promisePool.query(dataQuery, params);
         req.tasks = tasks;
     } catch (err) {
         console.log(err);
@@ -125,6 +133,7 @@ async function GetFilteredTasks(req, res, next) {
     req.category = category;
     next();
 }
+
 
 module.exports = {
     GetAllTask,

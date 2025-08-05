@@ -30,7 +30,7 @@
 </head>
 <body>
 
-<h2 style="text-align:center;">✏️ עריכת משימה</h2>
+<h2 style="text-align:center;"> עריכת משימה</h2>
 
 <form action="/T/Edit" method="POST">
     <input type="hidden" name="id" value="<%= task.id %>">
@@ -52,13 +52,16 @@
 
     <label>בוצע?</label>
     <select name="is_completed">
-        <option value="0" <%= task.is_completed ? "" : "selected" %>>❌ לא</option>
-        <option value="1" <%= task.is_completed ? "selected" : "" %>>✅ כן</option>
+        <option value="0" <%= task.is_completed ? "" : "selected" %>> לא</option>
+        <option value="1" <%= task.is_completed ? "selected" : "" %>> כן</option>
     </select>
 
     <div class="actions">
-        <button type="submit">💾 שמור שינויים</button>
-        <a href="/T">🔙 חזור לרשימה</a>
+        <button type="submit"> שמור שינויים</button>
+        <a href="/T"> חזור לרשימה</a>
+        <a href="/C/Add">הוספת קטגוריה</a>
+        <a href="/U/Home"> חזרה לדף הבית </a>
+
     </div>
 </form>
 

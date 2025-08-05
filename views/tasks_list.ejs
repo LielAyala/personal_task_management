@@ -45,8 +45,9 @@
     <thead>
     <tr>
         <th>תיאור משימה</th>
+        <th>קטגוריה</th>
         <th>תאריך לביצוע</th>
-        <th>בוצע?</th>
+        <th>סטטוס</th>
         <th>פעולות</th>
     </tr>
     </thead>
@@ -55,21 +56,25 @@
         <tr>
             <td><%= task.description %></td>
             <td>
+                <%= (categories.find(cat => cat.id === task.category_id) || {}).name || "ללא קטגוריה" %>
+            </td>
+            <td>
                 <%= task.due_date ? new Date(task.due_date).toLocaleDateString("he-IL") : "ללא תאריך" %>
             </td>
             <td>
                 <form action="/T/UpdateStatus" method="POST">
                     <input type="hidden" name="id" value="<%= task.id %>">
                     <input type="checkbox" name="is_completed" value="1" onchange="this.form.submit()" <%= task.is_completed ? "checked" : "" %>>
+                    <span><%= task.is_completed ? "בוצע" : "לא בוצע" %></span>
                 </form>
             </td>
             <td class="actions">
                 <form action="/T/Edit/<%= task.id %>" method="GET">
-                    <button type="submit">✏️ ערוך</button>
+                    <button type="submit">ערוך</button>
                 </form>
                 <form action="/T/Delete" method="POST" onsubmit="return confirm('האם אתה בטוח שברצונך למחוק?')">
                     <input type="hidden" name="id" value="<%= task.id %>">
-                    <button type="submit">🗑️ מחק</button>
+                    <button type="submit">מחק</button>
                 </form>
             </td>
         </tr>
@@ -95,8 +100,9 @@
 </div>
 
 <div class="bottom-links">
-    <a href="/T/Add">➕ הוסף משימה חדשה</a> |
-    <a href="/C/Add">➕ הוסף קטגוריה חדשה</a>
+    <a href="/T/Add">הוסף משימה חדשה</a> |
+    <a href="/C/Add">הוסף קטגוריה חדשה</a> |
+    <a href="/U/Home">חזרה לדף הבית</a>
 </div>
 
 </body>

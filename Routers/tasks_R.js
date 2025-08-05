@@ -4,7 +4,7 @@ const router = express.Router();
 const taskMid = require("../middleware/tasks_Mid");
 const userMid = require("../middleware/user_Mid");
 const categoryMid= require("../middleware/category_Mid");
-const db_pool = require("../database"); // ✅ לא לשכוח את זה!
+const db_pool = require("../database");
 
 router.get("/", [userMid.isLogged, taskMid.GetFilteredTasks, categoryMid.GetAllCategories], (req, res) => {
     res.render("tasks_list", {
@@ -16,8 +16,6 @@ router.get("/", [userMid.isLogged, taskMid.GetFilteredTasks, categoryMid.GetAllC
         category: req.category
     });
 });
-
-
 router.get("/Add", userMid.isLogged, async (req, res) => {
     const userId = req.user_id;
 
@@ -33,15 +31,12 @@ router.get("/Add", userMid.isLogged, async (req, res) => {
         res.status(500).send("שגיאה בטעינת טופס המשימה");
     }
 });
-
 router.post("/Add", [userMid.isLogged, taskMid.AddTask], (req, res) => {
     res.redirect("/T");
 });
-
 router.post("/Delete", [userMid.isLogged, taskMid.DeleteTask], (req, res) => {
     res.redirect("/T");
 });
-
 router.get("/Edit/:id", userMid.isLogged, async (req, res) => {
     const taskId = parseInt(req.params.id);
     const userId = req.user_id;
@@ -66,11 +61,9 @@ router.get("/Edit/:id", userMid.isLogged, async (req, res) => {
         res.status(500).send("שגיאה בשרת");
     }
 });
-
 router.post("/Edit", userMid.isLogged, taskMid.UpdateTask, (req, res) => {
     res.redirect("/T");
 });
-
 router.post("/UpdateStatus", userMid.isLogged, taskMid.UpdateTaskStatus, (req, res) => {
     res.redirect("/T");
 });
