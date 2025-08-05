@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>רשימת משימות</title>
+    <style>
+        body {
+            direction: rtl;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+<h2 style="text-align:center;">רשימת משימות</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>תיאור משימה</th>
+        <th>תאריך לביצוע</th>
+        <th>סטטוס</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for (let task of tasks) { %>
+        <tr>
+            <td><%= task.description %></td>
+            <td>
+                <%= task.due_date
+                        ? new Date(task.due_date).toLocaleDateString("he-IL")
+                        : "ללא תאריך" %>
+            </td>
+            <td>
+                <%= task.is_completed ? "✅ בוצע" : "❌ לא בוצע" %>
+            </td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>הוספת משימה</title>
+    <style>
+        body {
+            direction: rtl;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, select, button {
+            display: block;
+            margin-top: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>➕ הוספת משימה חדשה</h2>
+
+<form action="/T/Add" method="POST">
+    <label for="description">תיאור המשימה:</label>
+    <input type="text" id="description" name="description" required>
+
+    <label for="category_id">בחר קטגוריה:</label>
+    <select id="category_id" name="category_id" required>
+        <% for (let cat of categories) { %>
+            <option value="<%= cat.id %>"><%= cat.name %></option>
+        <% } %>
+    </select>
+
+    <label for="due_date">תאריך יעד:</label>
+    <input type="date" id="due_date" name="due_date" required>
+
+    <button type="submit">הוסף</button>
+</form>
+
+<a href="/T">← חזרה לרשימת משימות</a>
+
+</body>
+</html>
