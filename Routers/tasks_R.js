@@ -3,28 +3,21 @@ const router = express.Router();
 
 const taskMid = require("../middleware/tasks_Mid");
 const userMid = require("../middleware/user_Mid");
+const categoryMid= require("../middleware/category_Mid");
 const db_pool = require("../database"); // ✅ לא לשכוח את זה!
 
-
-router.get("/", [userMid.isLogged, taskMid.GetAllTask], async (req, res) => {
-    const userId = req.user_id;
-
-    try {
-        const [categories] = await db_pool.query(
-            "SELECT id, name FROM categories WHERE user_id = ?",
-            [userId]
-        );
-
-        res.render("tasks_list", {
-            tasks: req.tasks,
-            categories: categories
-        });
-
-    } catch (err) {
-        console.error("שגיאה בטעינת קטגוריות:", err);
-        res.status(500).send("שגיאה בטעינת רשימת המשימות");
-    }
+router.get("/", [userMid.isLogged, taskMid.GetFilteredTasks, categoryMid.GetAllCategories], (req, res) => {
+    res.render("tasks_list", {
+        tasks: req.tasks,
+        categories: req.categories,
+        page: req.page,
+        total_pages: req.total_pages,
+        status: req.status,
+        category: req.category
+    });
 });
+
+
 router.get("/Add", userMid.isLogged, async (req, res) => {
     const userId = req.user_id;
 

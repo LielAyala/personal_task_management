@@ -2,7 +2,6 @@ const db_pool = require("../database");
 const {UpdateCategory} = require("./category_Mid");
 const addSlashes = require('slashes').addSlashes;
 
-// הוספת משימה
 async function AddTask(req, res, next) {
     const userId = req.user_id;
     let { description, category_id, due_date } = req.body;
@@ -23,8 +22,6 @@ async function AddTask(req, res, next) {
         res.status(500).send("בעיה בהוספת משימה");
     }
 }
-
-// שליפת כל המשימות של המשתמש
 async function GetAllTask(req, res, next) {
     const userId = req.user_id;
 
@@ -40,8 +37,6 @@ async function GetAllTask(req, res, next) {
         res.status(500).send("בעיה בטעינת משימות");
     }
 }
-
-
 async function DeleteTask(req, res, next) {
     const taskId = parseInt(req.body.id);
     const userId = req.user_id;
@@ -76,8 +71,6 @@ async function UpdateTask(req, res, next) {
         res.status(500).send("בעיה בעדכון משימה");
     }
 }
-
-
 async function UpdateTaskStatus(req, res, next) {
     const taskId = parseInt(req.body.id);
     const userId = req.user_id;
@@ -98,11 +91,46 @@ async function UpdateTaskStatus(req, res, next) {
         res.status(500).send("בעיה בעדכון סטטוס");
     }
 }
+async function GetFilteredTasks(req, res, next) {
+    const promisePool = require("../database");
+
+    const page = parseInt(req.query.p) || 0;
+    const status = req.query.status || "all";
+    const category = req.query.category || "all";
+    const rowPerPage = 10;
+
+    let where = " WHERE 1=1 ";
+    if (status === "done") where += " AND is_completed = 1 ";
+    else if (status === "not_done") where += " AND is_completed = 0 ";
+    if (category !== "all") where += ` AND category_id = ${parseInt(category)} `;
+
+    let countQuery = `SELECT COUNT(id) as cnt FROM tasks ${where}`;
+    let dataQuery = `SELECT * FROM tasks ${where} ORDER BY due_date ASC LIMIT ${page * rowPerPage}, ${rowPerPage}`;
+
+    try {
+        const [countRows] = await promisePool.query(countQuery);
+        const total_rows = countRows[0].cnt;
+        req.total_pages = Math.floor((total_rows - 1) / rowPerPage);
+
+        const [tasks] = await promisePool.query(dataQuery);
+        req.tasks = tasks;
+    } catch (err) {
+        console.log(err);
+        req.tasks = [];
+        req.total_pages = 0;
+    }
+
+    req.page = page;
+    req.status = status;
+    req.category = category;
+    next();
+}
 
 module.exports = {
     GetAllTask,
     AddTask,
     DeleteTask,
     UpdateTask,
-    UpdateTaskStatus
+    UpdateTaskStatus,
+    GetFilteredTasks
 };

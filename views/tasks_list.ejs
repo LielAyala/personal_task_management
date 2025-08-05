@@ -1,46 +1,19 @@
-
 <!doctype html>
 <html lang="he">
 <head>
     <meta charset="UTF-8">
     <title>רשימת משימות</title>
     <style>
-        body {
-            direction: rtl;
-            font-family: Arial, sans-serif;
-        }
-        table {
-            width: 90%;
-            margin: 20px auto;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #aaa;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #eee;
-        }
-        .actions form {
-            display: inline;
-        }
-        .bottom-links {
-            text-align: center;
-            margin-top: 30px;
-        }
-        .bottom-links a {
-            margin: 0 10px;
-        }
-        .filters {
-            width: 90%;
-            margin: 20px auto;
-            text-align: center;
-        }
-        .filters select {
-            padding: 5px;
-            margin: 0 10px;
-        }
+        body { direction: rtl; font-family: Arial, sans-serif; }
+        table { width: 90%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid #aaa; padding: 10px; text-align: center; }
+        th { background-color: #eee; }
+        .actions form { display: inline; }
+        .bottom-links { text-align: center; margin-top: 30px; }
+        .bottom-links a { margin: 0 10px; }
+        .filters { width: 90%; margin: 20px auto; text-align: center; }
+        .filters select { padding: 5px; margin: 0 10px; }
+        .pagination { text-align: center; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -48,22 +21,24 @@
 <h2 style="text-align:center;">רשימת משימות</h2>
 
 <div class="filters">
-    <label>סטטוס:
-        <select id="statusFilter" onchange="filterTasks()">
-            <option value="all">הכל</option>
-            <option value="done">בוצע</option>
-            <option value="not_done">לא בוצע</option>
-        </select>
-    </label>
+    <form method="get" action="/T/">
+        <label>סטטוס:
+            <select name="status" onchange="this.form.submit()">
+                <option value="all" <%= status === 'all' ? 'selected' : '' %>>הכל</option>
+                <option value="done" <%= status === 'done' ? 'selected' : '' %>>בוצע</option>
+                <option value="not_done" <%= status === 'not_done' ? 'selected' : '' %>>לא בוצע</option>
+            </select>
+        </label>
 
-    <label>קטגוריה:
-        <select id="categoryFilter" onchange="filterTasks()">
-            <option value="all">כל הקטגוריות</option>
-            <% for (let cat of categories) { %>
-                <option value="<%= cat.id %>"><%= cat.name %></option>
-            <% } %>
-        </select>
-    </label>
+        <label>קטגוריה:
+            <select name="category" onchange="this.form.submit()">
+                <option value="all" <%= category === 'all' ? 'selected' : '' %>>כל הקטגוריות</option>
+                <% for (let cat of categories) { %>
+                    <option value="<%= cat.id %>" <%= category == cat.id ? 'selected' : '' %>><%= cat.name %></option>
+                <% } %>
+            </select>
+        </label>
+    </form>
 </div>
 
 <table>
@@ -75,22 +50,17 @@
         <th>פעולות</th>
     </tr>
     </thead>
-    <tbody id="taskTableBody">
+    <tbody>
     <% for (let task of tasks) { %>
-        <tr
-                data-completed="<%= task.is_completed ? 'done' : 'not_done' %>"
-                data-category="<%= task.category_id %>">
+        <tr>
             <td><%= task.description %></td>
             <td>
-                <%= task.due_date
-                        ? new Date(task.due_date).toLocaleDateString("he-IL")
-                        : "ללא תאריך" %>
+                <%= task.due_date ? new Date(task.due_date).toLocaleDateString("he-IL") : "ללא תאריך" %>
             </td>
             <td>
                 <form action="/T/UpdateStatus" method="POST">
                     <input type="hidden" name="id" value="<%= task.id %>">
-                    <input type="checkbox" name="is_completed" value="1" onchange="this.form.submit()"
-                            <%= task.is_completed ? "checked" : "" %>>
+                    <input type="checkbox" name="is_completed" value="1" onchange="this.form.submit()" <%= task.is_completed ? "checked" : "" %>>
                 </form>
             </td>
             <td class="actions">
@@ -107,35 +77,27 @@
     </tbody>
 </table>
 
-<div class="bottom-links">
-    <a href="/T/Add">➕ הוסף משימה חדשה</a>
-    |
-    <a href="/C/Add">➕ הוסף קטגוריה חדשה</a>
+<div class="pagination">
+    <form method="get" action="/T/">
+        <input type="hidden" name="status" value="<%= status %>">
+        <input type="hidden" name="category" value="<%= category %>">
+
+        <% if(page > 0) { %>
+            <button name="p" value="<%= page - 1 %>">הקודם</button>
+        <% } %>
+
+        עמוד <%= page + 1 %> מתוך <%= total_pages + 1 %>
+
+        <% if(page < total_pages) { %>
+            <button name="p" value="<%= page + 1 %>">הבא</button>
+        <% } %>
+    </form>
 </div>
 
-<script>
-    function filterTasks() {
-        const status = document.getElementById("statusFilter").value;
-        const category = document.getElementById("categoryFilter").value;
-        const rows = document.querySelectorAll("#taskTableBody tr");
-
-        rows.forEach(row => {
-            const rowStatus = row.dataset.completed;
-            const rowCategory = row.dataset.category;
-
-            const matchStatus =
-                (status === "all") ||
-                (status === "done" && rowStatus === "done") ||
-                (status === "not_done" && rowStatus === "not_done");
-
-            const matchCategory =
-                (category === "all") ||
-                (rowCategory === category);
-
-            row.style.display = (matchStatus && matchCategory) ? "" : "none";
-        });
-    }
-</script>
+<div class="bottom-links">
+    <a href="/T/Add">➕ הוסף משימה חדשה</a> |
+    <a href="/C/Add">➕ הוסף קטגוריה חדשה</a>
+</div>
 
 </body>
 </html>
