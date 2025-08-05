@@ -27,7 +27,7 @@ router.post("/Delete", [userMid.isLogged, catMid.DeleteCategory], (req, res) => 
 });
 
 // הצגת טופס עריכת קטגוריה (דורש id)
-router.get("/Edit/:id", [userMid.isLogged], async (req, res) => {
+router.get("/Edit/:id", userMid.isLogged, async (req, res) => {
     const catId = parseInt(req.params.id);
     const userId = req.user_id;
 
@@ -36,7 +36,7 @@ router.get("/Edit/:id", [userMid.isLogged], async (req, res) => {
     }
 
     try {
-        const [rows] = await require("../database").query(
+        const [rows] = await db_pool.query(
             `SELECT * FROM categories WHERE id = ? AND user_id = ?`,
             [catId, userId]
         );
@@ -45,13 +45,13 @@ router.get("/Edit/:id", [userMid.isLogged], async (req, res) => {
 
         res.render("category_edit", { category: rows[0] });
     } catch (err) {
-        console.log("שגיאה בשליפת קטגוריה לעריכה:", err);
+        console.error("שגיאה בשליפת קטגוריה לעריכה:", err);
         res.status(500).send("שגיאה בשרת");
     }
 });
 
-// שליחת עדכון לקטגוריה
-router.post("/Edit", [userMid.isLogged, catMid.UpdateCategory], (req, res) => {
+
+router.post("/Edit", userMid.isLogged, catMid.UpdateCategory, (req, res) => {
     res.redirect("/C");
 });
 

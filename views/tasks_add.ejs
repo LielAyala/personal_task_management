@@ -2,48 +2,56 @@
 <html lang="he">
 <head>
     <meta charset="UTF-8">
-    <title>הוספת משימה</title>
+    <title>הוספת משימה חדשה</title>
     <style>
         body {
             direction: rtl;
             font-family: Arial, sans-serif;
-            padding: 20px;
+            margin: 20px;
         }
 
-        label {
-            display: block;
-            margin-top: 10px;
+        form {
+            max-width: 400px;
+            margin: auto;
         }
 
-        input, select, button {
+        label, input, select, button {
             display: block;
-            margin-top: 5px;
-            padding: 5px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-
-<h2>➕ הוספת משימה חדשה</h2>
+<h2 style="text-align:center;">📋 הוספת משימה</h2>
 
 <form action="/T/Add" method="POST">
-    <label for="description">תיאור המשימה:</label>
+    <label for="description">תיאור:</label>
     <input type="text" id="description" name="description" required>
 
-    <label for="category_id">בחר קטגוריה:</label>
+    <label for="category_id">קטגוריה:</label>
     <select id="category_id" name="category_id" required>
         <% for (let cat of categories) { %>
             <option value="<%= cat.id %>"><%= cat.name %></option>
         <% } %>
     </select>
 
-    <label for="due_date">תאריך יעד:</label>
+    <label for="due_date">תאריך לביצוע:</label>
     <input type="date" id="due_date" name="due_date" required>
 
-    <button type="submit">הוסף</button>
+    <button type="submit">➕ הוסף משימה</button>
 </form>
 
-<a href="/T">← חזרה לרשימת משימות</a>
-
+<a href="/T">🔙 חזרה לרשימת המשימות</a>
 </body>
 </html>

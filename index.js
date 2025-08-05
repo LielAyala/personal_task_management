@@ -59,6 +59,8 @@ app.listen(port, () => {
     console.log(`הוספת משתמש http://localhost:7777/U/Add`);
     console.log(`הוספת קטגוריה http://localhost:7777/C/Add`);
     console.log(`הצגת המשימות  http://localhost:7777/T`);
+    console.log(`הוספת המשימה  http://localhost:7777/T/Add`);
+
 
 
 });

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>עריכת משימה</title>
+    <style>
+        body {
+            direction: rtl;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        form {
+            max-width: 500px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"], input[type="date"], select {
+            padding: 8px;
+            font-size: 1em;
+        }
+        .actions {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h2 style="text-align:center;">✏️ עריכת משימה</h2>
+
+<form action="/T/Edit" method="POST">
+    <input type="hidden" name="id" value="<%= task.id %>">
+
+    <label>תיאור משימה:</label>
+    <input type="text" name="description" value="<%= task.description %>" required>
+
+    <label>תאריך לביצוע:</label>
+    <input type="date" name="due_date" value="<%= task.due_date ? task.due_date.toISOString().split('T')[0] : '' %>" required>
+
+    <label>קטגוריה:</label>
+    <select name="category_id" required>
+        <% for (let cat of categories) { %>
+            <option value="<%= cat.id %>" <%= task.category_id === cat.id ? "selected" : "" %>>
+                <%= cat.name %>
+            </option>
+        <% } %>
+    </select>
+
+    <label>בוצע?</label>
+    <select name="is_completed">
+        <option value="0" <%= task.is_completed ? "" : "selected" %>>❌ לא</option>
+        <option value="1" <%= task.is_completed ? "selected" : "" %>>✅ כן</option>
+    </select>
+
+    <div class="actions">
+        <button type="submit">💾 שמור שינויים</button>
+        <a href="/T">🔙 חזור לרשימה</a>
+    </div>
+</form>
+
+</body>
+</html>
