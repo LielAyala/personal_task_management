@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
         }
         table {
-            width: 50%;
+            width: 60%;
             margin: 20px auto;
             border-collapse: collapse;
         }
@@ -24,27 +24,55 @@
         form {
             margin: 0;
         }
+        a.button {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-<h2>רשימת קטגוריות</h2>
-<a href="/C/Add">➕ הוספת קטגוריה חדשה</a>
+<h2 style="text-align:center;">רשימת קטגוריות</h2>
+
+<div style="text-align:center; margin-bottom: 20px;">
+    <a class="button" href="/C/Add">➕ הוספת קטגוריה חדשה</a>
+</div>
+
 <table>
     <thead>
-    <tr><th>שם</th><th>מחיקה</th></tr>
+    <tr>
+        <th>שם</th>
+        <th>עריכה</th>
+        <th>מחיקה</th>
+    </tr>
     </thead>
     <tbody>
     <% for (let cat of categories) { %>
         <tr>
             <td><%= cat.name %></td>
+
             <td>
-                <form action="/C/Delete" method="POST">
+                <a class="button" href="/C/Edit/<%= cat.id %>"> ערוך</a>
+            </td>
+
+            <td>
+                <form action="/C/Delete" method="POST" onsubmit="return confirm('בטוח/ה שברצונך למחוק?')">
                     <input type="hidden" name="id" value="<%= cat.id %>">
-                    <button type="submit">מחק</button>
+                    <button type="submit"> מחק</button>
                 </form>
             </td>
         </tr>
-
     <% } %>
     </tbody>
 </table>

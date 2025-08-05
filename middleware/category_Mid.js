@@ -52,8 +52,30 @@ async function DeleteCategory(req, res, next) {
     }
 }
 
+async function UpdateCategory(req, res, next) {
+    const catId = parseInt(req.body.id);
+    const newName = addSlashes(req.body.name || "");
+    const userId = req.user_id;
+
+    if (!catId || !newName || !userId) {
+        return res.status(400).send("נתונים חסרים לעדכון");
+    }
+
+    try {
+        await db_pool.query(
+            `UPDATE categories SET name = ? WHERE id = ? AND user_id = ?`,
+            [newName, catId, userId]
+        );
+        next();
+    } catch (err) {
+        console.log("שגיאה בעדכון קטגוריה:", err);
+        res.status(500).send("בעיה בעדכון קטגוריה");
+    }
+}
+
 module.exports = {
     GetAllCategories,
     AddCategory,
-    DeleteCategory
+    DeleteCategory,
+    UpdateCategory
 };

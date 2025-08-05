@@ -4,20 +4,54 @@ const router = express.Router();
 const catMid = require("../middleware/category_Mid");
 const userMid = require("../middleware/user_Mid");
 
+// הצגת כל הקטגוריות
 router.get("/", [userMid.isLogged, catMid.GetAllCategories], (req, res) => {
     res.render("category_list", {
         categories: req.categories
     });
 });
 
-router.post("/Add", [userMid.isLogged, catMid.AddCategory], (req, res) => {
-    res.redirect("/C");
-});
+// הצגת טופס הוספת קטגוריה
 router.get("/Add", userMid.isLogged, (req, res) => {
     res.render("category_add");
 });
 
+// שליחת קטגוריה חדשה
+router.post("/Add", [userMid.isLogged, catMid.AddCategory], (req, res) => {
+    res.redirect("/C");
+});
+
+// מחיקת קטגוריה
 router.post("/Delete", [userMid.isLogged, catMid.DeleteCategory], (req, res) => {
+    res.redirect("/C");
+});
+
+// הצגת טופס עריכת קטגוריה (דורש id)
+router.get("/Edit/:id", [userMid.isLogged], async (req, res) => {
+    const catId = parseInt(req.params.id);
+    const userId = req.user_id;
+
+    if (!catId || !userId) {
+        return res.status(400).send("נתונים חסרים");
+    }
+
+    try {
+        const [rows] = await require("../database").query(
+            `SELECT * FROM categories WHERE id = ? AND user_id = ?`,
+            [catId, userId]
+        );
+
+        if (rows.length === 0) return res.status(404).send("קטגוריה לא נמצאה");
+
+        res.render("category_edit", { category: rows[0] });
+    } catch (err) {
+        console.log("שגיאה בשליפת קטגוריה לעריכה:", err);
+        res.status(500).send("שגיאה בשרת");
+    }
+});
+
+// שליחת עדכון לקטגוריה
+router.post("/Edit", [userMid.isLogged, catMid.UpdateCategory], (req, res) => {
     res.redirect("/C");
 });
 
